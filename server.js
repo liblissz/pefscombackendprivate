@@ -17,7 +17,10 @@ import { type } from "os";
 import SibApiV3Sdk from 'sib-api-v3-sdk';
 import bodyParser from 'body-parser';
 
-dotenv.config({ path: "./config.env" });
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config({ path: './config.env' });
+}
+
 
 
 const client = SibApiV3Sdk.ApiClient.instance;
