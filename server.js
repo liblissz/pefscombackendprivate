@@ -1041,7 +1041,6 @@ const NotificationModel = mongoose.model('Notification', NotificationSchema);
 
 
 
-
 app.post("/admin/picture/post", async (req, res) => {
   try {
     const { title, content, price, ImageUrl, date } = req.body;
@@ -1050,78 +1049,40 @@ app.post("/admin/picture/post", async (req, res) => {
     const savePost = new pictureModel({ title, content, price, ImageUrl, date });
     await savePost.save();
 
+    // Notify subscribers
+    const subscribers = await subscribemodel.find();
 
-
-    //notify subscribers
-
-    const subscribers = await subscribemodel.find()
-
-
-    for (subscriber of subscribers){
-
-
+    for (const subscriber of subscribers) {
       try {
         const sendEmail = {
-   sender: {email: "libliszz3@gmail.com", name: "PEFSCOM"},
-   to: {email: subscriber.email},
-   subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
-    htmlContent: `
+          sender: { email: "liblissz3@gmail.com", name: "PEFSCOM" },
+          to: { email: subscriber.email },
+          subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
+          htmlContent: `
             <!DOCTYPE html>
             <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>Pefscom Posts Notification</title>
-            </head>
+            <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
             <body>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
-                <tr>
-                  <td align="center" style="padding: 20px 10px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
-                      <tr>
-                        <td align="center">
-                          <img src="${ImageUrl}" alt="Project Image" width="600" style="display:block; width:100%; height:auto; object-fit: cover; filter: brightness(0.7);" />
-                          <div style="padding: 20px; text-align: center; color: #87cefa;">
-                            <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">
-                              🚀Hello ${subscriber.email} <br><br> A New Project Notification
-                            </h1>
-                            <p style="font-size: 18px;">A new Picture Post has been added to Pefscom</p>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 0 30px 30px;">
-                          <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
-                          <p><strong>Title:</strong> ${title}</p>
-                          <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
-                          <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
-                          <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
-                          <hr style="border-color: blue;">
-                          <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom subscribers.</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
-                          <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
-                          <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
+              <div style="background:#000; padding:30px; color:#87cefa; font-family:Georgia, serif;">
+                <h1>🚀 Hello ${subscriber.email}</h1>
+                <p>A new Picture Post has been added to Pefscom</p>
+                <img src="${ImageUrl}" style="width:100%; height:auto; border-radius:8px;" />
+                <h2>Post Details</h2>
+                <p><strong>Title:</strong> ${title}</p>
+                <p><strong>Description:</strong> ${content}</p>
+                <p><strong>Price:</strong> ${price}</p>
+                <p><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
+                <hr />
+                <p>This is an automatic notification to Pefscom subscribers.</p>
+              </div>
             </body>
             </html>
           `
         };
-  const result = await emailApi.sendTransacEmail(sendEmail);
-        console.log(`📧 Email sent to: ${admin.email} | MessageId: ${result.messageId}`);
-        
-
-
-      } catch (error) {
-        console.error(`❌ Failed to email ${admin.email}:`, emailErr.message);
-        
+        const result = await emailApi.sendTransacEmail(sendEmail);
+        console.log(`📧 Email sent to subscriber: ${subscriber.email} | MessageId: ${result.messageId}`);
+      } catch (emailErr) {
+        console.error(`❌ Failed to email subscriber ${subscriber.email}:`, emailErr.message);
       }
     }
 
@@ -1137,57 +1098,28 @@ app.post("/admin/picture/post", async (req, res) => {
           htmlContent: `
             <!DOCTYPE html>
             <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>Pefscom Posts Notification</title>
-            </head>
+            <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
             <body>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
-                <tr>
-                  <td align="center" style="padding: 20px 10px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
-                      <tr>
-                        <td align="center">
-                          <img src="${ImageUrl}" alt="Project Image" width="600" style="display:block; width:100%; height:auto; object-fit: cover; filter: brightness(0.7);" />
-                          <div style="padding: 20px; text-align: center; color: #87cefa;">
-                            <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">
-                              🚀Hello ${admin.username} <br><br> A New Project Notification
-                            </h1>
-                            <p style="font-size: 18px;">A new Picture Post has been added to Pefscom</p>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 0 30px 30px;">
-                          <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
-                          <p><strong>Title:</strong> ${title}</p>
-                          <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
-                          <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
-                          <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
-                          <hr style="border-color: blue;">
-                          <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom admins.</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
-                          <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
-                          <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
+              <div style="background:#000; padding:30px; color:#87cefa; font-family:Georgia, serif;">
+                <h1>🚀 Hello ${admin.username}</h1>
+                <p>A new Picture Post has been added to Pefscom</p>
+                <img src="${ImageUrl}" style="width:100%; height:auto; border-radius:8px;" />
+                <h2>Post Details</h2>
+                <p><strong>Title:</strong> ${title}</p>
+                <p><strong>Description:</strong> ${content}</p>
+                <p><strong>Price:</strong> ${price}</p>
+                <p><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
+                <hr />
+                <p>This is an automatic notification to Pefscom admins.</p>
+              </div>
             </body>
             </html>
           `
         };
-
         const result = await emailApi.sendTransacEmail(sendSmtpEmail);
-        console.log(`📧 Email sent to: ${admin.email} | MessageId: ${result.messageId}`);
+        console.log(`📧 Email sent to admin: ${admin.email} | MessageId: ${result.messageId}`);
       } catch (emailErr) {
-        console.error(`❌ Failed to email ${admin.email}:`, emailErr.message);
+        console.error(`❌ Failed to email admin ${admin.email}:`, emailErr.message);
       }
     }
 
@@ -1198,62 +1130,33 @@ app.post("/admin/picture/post", async (req, res) => {
       try {
         const sendSmtpEmail = {
           sender: { email: 'liblissz3@gmail.com', name: 'Pefscom' },
-          to: [{ email: user.email }], // fixed here
-          subject: `🚀 New Project Posted On PEFSCOM SYSTEM: ${user.name}`,
+          to: [{ email: user.email }],
+          subject: `🚀 New Project Posted On PEFSCOM SYSTEM: ${title}`,
           htmlContent: `
             <!DOCTYPE html>
             <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>Pefscom Posts Notification</title>
-            </head>
+            <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /></head>
             <body>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
-                <tr>
-                  <td align="center" style="padding: 20px 10px;">
-                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
-                      <tr>
-                        <td align="center">
-                          <img src="${ImageUrl}" alt="Project Image" width="600" style="display:block; width:100%; height:auto; object-fit: cover; filter: brightness(0.7);" />
-                          <div style="padding: 20px; text-align: center; color: #87cefa;">
-                            <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">
-                              🚀Hello ${user.name} <br><br> A New Project Notification
-                            </h1>
-                            <p style="font-size: 18px;">A new Picture Post has been added to Pefscom</p>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 0 30px 30px;">
-                          <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
-                          <p><strong>Title:</strong> ${title}</p>
-                          <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
-                          <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
-                          <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
-                          <hr style="border-color: blue;">
-                          <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom Users.</p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
-                          <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
-                          <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
+              <div style="background:#000; padding:30px; color:#87cefa; font-family:Georgia, serif;">
+                <h1>🚀 Hello ${user.name}</h1>
+                <p>A new Picture Post has been added to Pefscom</p>
+                <img src="${ImageUrl}" style="width:100%; height:auto; border-radius:8px;" />
+                <h2>Post Details</h2>
+                <p><strong>Title:</strong> ${title}</p>
+                <p><strong>Description:</strong> ${content}</p>
+                <p><strong>Price:</strong> ${price}</p>
+                <p><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
+                <hr />
+                <p>This is an automatic notification to Pefscom users.</p>
+              </div>
             </body>
             </html>
           `
         };
-
         const result = await emailApi.sendTransacEmail(sendSmtpEmail);
-        console.log(`📧 Email sent to: ${user.email} | MessageId: ${result.messageId}`);
+        console.log(`📧 Email sent to user: ${user.email} | MessageId: ${result.messageId}`);
       } catch (emailErr) {
-        console.error(`❌ Failed to email ${user.email}:`, emailErr.message);
+        console.error(`❌ Failed to email user ${user.email}:`, emailErr.message);
       }
     }
 
@@ -1275,7 +1178,7 @@ app.post("/admin/picture/post", async (req, res) => {
 
     res.status(200).json({ message: "Post made successfully" });
   } catch (error) {
-    console.error('Error in /admin/picture/post:', error);
+    console.error('❌ Error in /admin/picture/post:', error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -1418,68 +1321,43 @@ app.post("/admin/video/post", async (req, res) => {
   try {
     const { title, content, price, VidUrl, date } = req.body;
 
+    // Save the video post
     const savePostvideo = new VideoModel({ title, content, price, VidUrl, date });
     await savePostvideo.save();
 
-
-
-    //subcribers
-
+    // Notify Subscribers
     const subscribers = await subscribemodel.find();
-
-    for(subscriber of subscribers){
-
+    for (const subscriber of subscribers) {
       try {
-        const  sendEmail = {
-          sender: {email: 'liblissz3@gmail.com', name: "pefscom"},
+        const sendEmail = {
+          sender: { email: 'liblissz3@gmail.com', name: 'Pefscom' },
           to: [{ email: subscriber.email }],
           subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
-           htmlContent: `
+          htmlContent: `
             <!DOCTYPE html>
-            <html lang="en">
-            <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Pefscom Posts Notification</title></head>
-            <body>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
-                <tr><td align="center" style="padding: 20px 10px;">
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
-                    <tr><td align="center">
-                      <a href="${VidUrl}">CLICK HERE TO SEE THE VIDEO</a>
-                      <div style="padding: 20px; text-align: center; color: #87cefa;">
-                        <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">🚀 Hello Subscriber: <br><br> New Project Notification</h1>
-                        <p style="font-size: 18px;">A new Video Post has been added to Pefscom</p>
-                      </div>
-                    </td></tr>
-                    <tr><td style="padding: 0 30px 30px;">
-                      <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
-                      <p><strong>Title:</strong> ${title}</p>
-                      <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
-                      <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
-                      <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
-                      <hr style="border-color: blue;">
-                      <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom subscribers.</p>
-                    </td></tr>
-                    <tr><td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
-                      <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
-                      <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
-                    </td></tr>
-                  </table>
-                </td></tr>
-              </table>
+            <html>
+            <body style="background:#000; color:#87cefa; font-family:Georgia, serif;">
+              <h1>🚀 Hello Subscriber</h1>
+              <p>A new video has been posted on Pefscom.</p>
+              <a href="${VidUrl}" style="color:#1e90ff;">Click here to watch the video</a>
+              <h2>Post Details</h2>
+              <p><strong>Title:</strong> ${title}</p>
+              <p><strong>Description:</strong> ${content}</p>
+              <p><strong>Price:</strong> ${price}</p>
+              <p><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
             </body>
             </html>
           `
-
         };
-        const result = await emailApi.sendTransacEmail(sendSmtpEmail);
-      console.log(`📧 Email sent to: ${admin.email} | MessageId: ${result.messageId}`);
-      } catch (error) {
-         console.error(`❌ Failed to email ${admin.email}:`, emailErr.message);
+        const result = await emailApi.sendTransacEmail(sendEmail);
+        console.log(`📧 Email sent to subscriber: ${subscriber.email} | MessageId: ${result.messageId}`);
+      } catch (err) {
+        console.error(`❌ Failed to email subscriber ${subscriber.email}:`, err.message);
       }
     }
 
-    // Notify admins
+    // Notify Admins
     const admins = await Usermodel.find();
-
     for (const admin of admins) {
       try {
         const sendSmtpEmail = {
@@ -1488,110 +1366,70 @@ app.post("/admin/video/post", async (req, res) => {
           subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
           htmlContent: `
             <!DOCTYPE html>
-            <html lang="en">
-            <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Pefscom Posts Notification</title></head>
-            <body>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
-                <tr><td align="center" style="padding: 20px 10px;">
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
-                    <tr><td align="center">
-                      <a href="${VidUrl}">CLICK HERE TO SEE THE VIDEO</a>
-                      <div style="padding: 20px; text-align: center; color: #87cefa;">
-                        <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">🚀 New Project Notification</h1>
-                        <p style="font-size: 18px;">A new Video Post has been added to Pefscom</p>
-                      </div>
-                    </td></tr>
-                    <tr><td style="padding: 0 30px 30px;">
-                      <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
-                      <p><strong>Title:</strong> ${title}</p>
-                      <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
-                      <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
-                      <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
-                      <hr style="border-color: blue;">
-                      <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom admins.</p>
-                    </td></tr>
-                    <tr><td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
-                      <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
-                      <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
-                    </td></tr>
-                  </table>
-                </td></tr>
-              </table>
+            <html>
+            <body style="background:#000; color:#87cefa; font-family:Georgia, serif;">
+              <h1>🚀 Hello ${admin.username}</h1>
+              <p>A new video has been posted on Pefscom.</p>
+              <a href="${VidUrl}" style="color:#1e90ff;">Click here to watch the video</a>
+              <h2>Post Details</h2>
+              <p><strong>Title:</strong> ${title}</p>
+              <p><strong>Description:</strong> ${content}</p>
+              <p><strong>Price:</strong> ${price}</p>
+              <p><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
             </body>
             </html>
           `
         };
         const result = await emailApi.sendTransacEmail(sendSmtpEmail);
-        console.log(`📧 Email sent to: ${admin.email} | MessageId: ${result.messageId}`);
-      } catch (emailErr) {
-        console.error(`❌ Failed to email ${admin.email}:`, emailErr.message);
+        console.log(`📧 Email sent to admin: ${admin.email} | MessageId: ${result.messageId}`);
+      } catch (err) {
+        console.error(`❌ Failed to email admin ${admin.email}:`, err.message);
       }
     }
 
-    // Notify normal users
+    // Notify Normal Users
     const users = await normalusermodel.find();
-
     for (const user of users) {
       try {
         const sendSmtpEmail = {
           sender: { email: 'liblissz3@gmail.com', name: 'Pefscom' },
           to: [{ email: user.email }],
-          subject: `🚀 New Project Posted On PEFSCOM: ${user.name}`,
+          subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
           htmlContent: `
             <!DOCTYPE html>
-            <html lang="en">
-            <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Pefscom Posts Notification</title></head>
-            <body>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
-                <tr><td align="center" style="padding: 20px 10px;">
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
-                    <tr><td align="center">
-                      <a href="${VidUrl}">CLICK HERE TO SEE THE VIDEO</a>
-                      <div style="padding: 20px; text-align: center; color: #87cefa;">
-                        <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">
-                          🚀Hello ${user.name}<br><br><br> New Project Notification
-                        </h1>
-                        <p style="font-size: 18px;">A new Video Post has been added to Pefscom</p>
-                      </div>
-                    </td></tr>
-                    <tr><td style="padding: 0 30px 30px;">
-                      <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
-                      <p><strong>Title:</strong> ${title}</p>
-                      <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
-                      <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
-                      <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
-                      <hr style="border-color: blue;">
-                      <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom Users.</p>
-                    </td></tr>
-                    <tr><td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
-                      <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
-                      <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
-                    </td></tr>
-                  </table>
-                </td></tr>
-              </table>
+            <html>
+            <body style="background:#000; color:#87cefa; font-family:Georgia, serif;">
+              <h1>🚀 Hello ${user.name}</h1>
+              <p>A new video has been posted on Pefscom.</p>
+              <a href="${VidUrl}" style="color:#1e90ff;">Click here to watch the video</a>
+              <h2>Post Details</h2>
+              <p><strong>Title:</strong> ${title}</p>
+              <p><strong>Description:</strong> ${content}</p>
+              <p><strong>Price:</strong> ${price}</p>
+              <p><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
             </body>
             </html>
           `
         };
         const result = await emailApi.sendTransacEmail(sendSmtpEmail);
-        console.log(`📧 Email sent to: ${user.email} | MessageId: ${result.messageId}`);
-      } catch (emailErr) {
-        console.error(`❌ Failed to email ${user.email}:`, emailErr.message);
+        console.log(`📧 Email sent to user: ${user.email} | MessageId: ${result.messageId}`);
+      } catch (err) {
+        console.error(`❌ Failed to email user ${user.email}:`, err.message);
       }
     }
 
-    // Emit socket.io notification
+    // Emit socket notification
     const io = req.app.get('io');
     io.emit('PushPostvideoNotification', { savePostvideo: savePostvideo.toObject() });
-    console.log('📢 Emitting new video post:', savePostvideo.title);
+    console.log('📢 Emitted new video post:', savePostvideo.title);
 
-    res.status(200).json({ message: "post made successfully" });
+    res.status(200).json({ message: "Post made successfully" });
   } catch (error) {
-    console.error('Error in /admin/video/post:', error);
-    res.status(500).json({ message: "internal server error" });
+    console.error('❌ Error in /admin/video/post:', error.message);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 
@@ -2192,40 +2030,59 @@ app.get('/api/pageview', async (req, res) => {
 
 
 
-const subscribe = mongoose.Schema(
-  {
-    email:{
-      type: String, 
-      required: true
-    },
-     date: {
+const mongoose = require('mongoose');
+
+// Define schema
+const subscribeSchema = new mongoose.Schema({
+  email: {
     type: String,
-    default: () => new Date().toLocaleString('en-US', {
-      timeZone: 'Africa/Douala',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    })
+    required: true,
+    unique: true, // Optional: Prevent duplicate emails
+    lowercase: true,
+    trim: true
   },
+  date: {
+    type: String,
+    default: () =>
+      new Date().toLocaleString('en-US', {
+        timeZone: 'Africa/Douala',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
   }
-)
+});
 
-const subscribemodel = mongoose.model("subscribers", subscribe)
+const SubscribeModel = mongoose.model("subscribers", subscribeSchema);
 
-app.post('/subscribe', async (req,res)=>{
 
+app.post('/subscribe', async (req, res) => {
   try {
-    const {email} = req.body
-    const savedata = new subscribemodel({email})
-    await savedata.save()
-    res.status(200).json({message: "data saved successfully👨"})
+    const { email } = req.body;
+
+    
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+
+    const existing = await SubscribeModel.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ message: "Email already subscribed." });
+    }
+
+    const saveData = new SubscribeModel({ email });
+    await saveData.save();
+
+    res.status(200).json({ message: "Data saved successfully 👨" });
   } catch (error) {
-       res.status(500).json({message: "Internal Server Error"})
+    console.error("Subscription error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-})
+});
 
 
 connectdb().then(() => {
