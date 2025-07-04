@@ -1050,6 +1050,81 @@ app.post("/admin/picture/post", async (req, res) => {
     const savePost = new pictureModel({ title, content, price, ImageUrl, date });
     await savePost.save();
 
+
+
+    //notify subscribers
+
+    const subscribers = await subscribemodel.find()
+
+
+    for (subscriber of subscribers){
+
+
+      try {
+        const sendEmail = {
+   sender: {email: "libliszz3@gmail.com", name: "PEFSCOM"},
+   to: {email: subscriber.email},
+   subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
+    htmlContent: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Pefscom Posts Notification</title>
+            </head>
+            <body>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
+                <tr>
+                  <td align="center" style="padding: 20px 10px;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
+                      <tr>
+                        <td align="center">
+                          <img src="${ImageUrl}" alt="Project Image" width="600" style="display:block; width:100%; height:auto; object-fit: cover; filter: brightness(0.7);" />
+                          <div style="padding: 20px; text-align: center; color: #87cefa;">
+                            <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">
+                              🚀Hello ${subscriber.email} <br><br> A New Project Notification
+                            </h1>
+                            <p style="font-size: 18px;">A new Picture Post has been added to Pefscom</p>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 0 30px 30px;">
+                          <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
+                          <p><strong>Title:</strong> ${title}</p>
+                          <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
+                          <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
+                          <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
+                          <hr style="border-color: blue;">
+                          <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom subscribers.</p>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
+                          <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
+                          <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </body>
+            </html>
+          `
+        };
+  const result = await emailApi.sendTransacEmail(sendEmail);
+        console.log(`📧 Email sent to: ${admin.email} | MessageId: ${result.messageId}`);
+        
+
+
+      } catch (error) {
+        console.error(`❌ Failed to email ${admin.email}:`, emailErr.message);
+        
+      }
+    }
+
     // Notify admins
     const admins = await Usermodel.find();
 
@@ -1345,6 +1420,62 @@ app.post("/admin/video/post", async (req, res) => {
 
     const savePostvideo = new VideoModel({ title, content, price, VidUrl, date });
     await savePostvideo.save();
+
+
+
+    //subcribers
+
+    const subscribers = await subscribemodel.find();
+
+    for(subscriber of subscribers){
+
+      try {
+        const  sendEmail = {
+          sender: {email: 'liblissz3@gmail.com', name: "pefscom"},
+          to: [{ email: subscriber.email }],
+          subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
+           htmlContent: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>Pefscom Posts Notification</title></head>
+            <body>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#000000">
+                <tr><td align="center" style="padding: 20px 10px;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width:600px; background: linear-gradient(135deg, #000000 0%, #1c1c1c 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,255,0.3);">
+                    <tr><td align="center">
+                      <a href="${VidUrl}">CLICK HERE TO SEE THE VIDEO</a>
+                      <div style="padding: 20px; text-align: center; color: #87cefa;">
+                        <h1 style="font-size: 36px; font-weight: 700; font-family: 'Georgia', serif; text-shadow: 0 0 10px rgba(0, 81, 255, 0.9);">🚀 Hello Subscriber: <br><br> New Project Notification</h1>
+                        <p style="font-size: 18px;">A new Video Post has been added to Pefscom</p>
+                      </div>
+                    </td></tr>
+                    <tr><td style="padding: 0 30px 30px;">
+                      <h2 style="color: #87cefa; font-family: 'Georgia', serif; font-size: 24px; margin-bottom: 10px;">Post Details</h2>
+                      <p><strong>Title:</strong> ${title}</p>
+                      <p style="color: #87cefa;"><strong>Description:</strong> ${content}</p>
+                      <p style="color: #87cefa;"><strong>Price:</strong> ${price}</p>
+                      <p style="color: #87cefa;"><strong>Date:</strong> ${new Date(date).toLocaleString()}</p>
+                      <hr style="border-color: blue;">
+                      <p style="font-size: 0.9em; color: #87cefa;">This is an automatic notification to Pefscom subscribers.</p>
+                    </td></tr>
+                    <tr><td align="center" style="padding: 20px; background: #111; color: #87cefa; font-size: 14px;">
+                      <p style="margin: 0;">Pefscom &copy; 2025 | All rights reserved</p>
+                      <p style="margin: 0;">Contact us: <a href="mailto:support@pefscom.com" style="color: #1e90ff; text-decoration: none;">support@pefscom.com</a></p>
+                    </td></tr>
+                  </table>
+                </td></tr>
+              </table>
+            </body>
+            </html>
+          `
+
+        };
+        const result = await emailApi.sendTransacEmail(sendSmtpEmail);
+      console.log(`📧 Email sent to: ${admin.email} | MessageId: ${result.messageId}`);
+      } catch (error) {
+         console.error(`❌ Failed to email ${admin.email}:`, emailErr.message);
+      }
+    }
 
     // Notify admins
     const admins = await Usermodel.find();
@@ -2058,6 +2189,43 @@ app.get('/api/pageview', async (req, res) => {
     res.status(500).json({ error: 'Failed to get views' });
   }
 });
+
+
+
+const subscribe = mongoose.Schema(
+  {
+    email:{
+      type: String, 
+      required: true
+    },
+     date: {
+    type: String,
+    default: () => new Date().toLocaleString('en-US', {
+      timeZone: 'Africa/Douala',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    })
+  },
+  }
+)
+
+const subscribemodel = mongoose.model("subscribers", subscribe)
+
+app.post('/subscribe', async (req,res)=>{
+
+  try {
+    const {email} = req.body
+    const savedata = new subscribemodel({email})
+    await savedata.save()
+    res.status(200).json({message: "data saved successfully👨"})
+  } catch (error) {
+       res.status(500).json({message: "Internal Server Error"})
+  }
+})
 
 
 connectdb().then(() => {
