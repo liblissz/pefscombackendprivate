@@ -847,18 +847,18 @@ const PictureSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    date: {
-      type: String,
-      default: () => new Date().toLocaleString('en-US', {
-        timeZone: 'Africa/Douala',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      })
-    }
+     date: {
+    type: String,
+    default: () => new Date().toLocaleString('en-US', {
+      timeZone: 'Africa/Douala',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    })
+  }
 
   });
 
