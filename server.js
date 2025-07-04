@@ -2030,7 +2030,6 @@ app.get('/api/pageview', async (req, res) => {
 
 
 
-const mongoose = require('mongoose');
 
 // Define schema
 const subscribeSchema = new mongoose.Schema({
