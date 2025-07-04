@@ -1122,7 +1122,7 @@ app.post("/admin/picture/post", async (req, res) => {
       try {
         const sendEmail = {
           sender: { email: "liblissz3@gmail.com", name: "PEFSCOM" },
-          to: { email: subscriber.email },
+          to: [{ email: subscriber.email }],
           subject: `🚀 New Project Posted On PEFSCOM: ${title}`,
           htmlContent: `
             <!DOCTYPE html>
