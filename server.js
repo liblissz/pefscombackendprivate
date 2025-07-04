@@ -761,6 +761,72 @@ app.put('/user/edit/:id', async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+// Define schema
+const subscribeSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true, // Optional: Prevent duplicate emails
+    lowercase: true,
+    trim: true
+  },
+  date: {
+    type: String,
+    default: () =>
+      new Date().toLocaleString('en-US', {
+        timeZone: 'Africa/Douala',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
+  }
+});
+
+const SubscribeModel = mongoose.model("subscribers", subscribeSchema);
+
+
+app.post('/subscribe', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+
+    const existing = await SubscribeModel.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ message: "Email already subscribed." });
+    }
+
+    const saveData = new SubscribeModel({ email });
+    await saveData.save();
+
+    res.status(200).json({ message: "Data saved successfully 👨" });
+  } catch (error) {
+    console.error("Subscription error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+
+
 //SCHEMA FOR POSTS
 
 const PictureSchema = mongoose.Schema(
@@ -2031,57 +2097,7 @@ app.get('/api/pageview', async (req, res) => {
 
 
 
-// Define schema
-const subscribeSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true, // Optional: Prevent duplicate emails
-    lowercase: true,
-    trim: true
-  },
-  date: {
-    type: String,
-    default: () =>
-      new Date().toLocaleString('en-US', {
-        timeZone: 'Africa/Douala',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      })
-  }
-});
 
-const SubscribeModel = mongoose.model("subscribers", subscribeSchema);
-
-
-app.post('/subscribe', async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    
-    if (!email) {
-      return res.status(400).json({ message: "Email is required." });
-    }
-
-
-    const existing = await SubscribeModel.findOne({ email });
-    if (existing) {
-      return res.status(409).json({ message: "Email already subscribed." });
-    }
-
-    const saveData = new SubscribeModel({ email });
-    await saveData.save();
-
-    res.status(200).json({ message: "Data saved successfully 👨" });
-  } catch (error) {
-    console.error("Subscription error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
 
 
 connectdb().then(() => {
