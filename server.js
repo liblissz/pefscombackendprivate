@@ -1109,7 +1109,6 @@ const NotificationModel = mongoose.model('Notification', NotificationSchema);
 
 
 
-
 app.get('/share/picture/:id', async (req, res) => {
   const post = await pictureModel.findById(req.params.id);
   if (!post) return res.status(404).send('Post not found');
@@ -1134,12 +1133,13 @@ app.get('/share/picture/:id', async (req, res) => {
   <body>
     <p>Redirecting to the full post...</p>
     <script>
-      window.location.href = "https://pefscomsystem.vercel.app/picturepost/${_id}";
+      setTimeout(function () {
+        window.location.href = "https://pefscomsystem.vercel.app/picturepost/${_id}";
+      }, 3000); // Delay redirect by 3 seconds
     </script>
   </body>
   </html>`);
 });
-
 
 
 
