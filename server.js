@@ -1114,7 +1114,7 @@ app.get('/share/picture/:id', async (req, res) => {
   const post = await pictureModel.findById(req.params.id);
   if (!post) return res.status(404).send('Post not found');
 
-  const { title, content, ImageUrl } = post;
+  const { title, content, ImageUrl, _id } = post;
 
   res.send(`
     <!DOCTYPE html>
@@ -1122,21 +1122,28 @@ app.get('/share/picture/:id', async (req, res) => {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      <!-- Open Graph Meta -->
       <meta property="og:title" content="${title}" />
       <meta property="og:description" content="${content}" />
       <meta property="og:image" content="${ImageUrl}" />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="og:type" content="article" />
-      <meta property="og:url" content="https://pefscombackendprivate.onrender.com/admin/picture/post/${post._id}" />
+      <meta property="og:url" content="https://pefscomsystem.vercel.app/picturepost/${_id}" />
+
       <title>${title}</title>
     </head>
     <body>
+      <p>Redirecting to the full post...</p>
       <script>
-        window.location.href = "https://pefscombackendprivate.onrender.com/admin/picture/post/${post._id}";
+        window.location.href = "https://pefscomsystem.vercel.app/picturepost/${_id}";
       </script>
     </body>
     </html>
   `);
 });
+
 
 
 
