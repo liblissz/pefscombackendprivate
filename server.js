@@ -1107,6 +1107,39 @@ const NotificationModel = mongoose.model('Notification', NotificationSchema);
 
 
 
+
+
+
+app.get('/share/picture/:id', async (req, res) => {
+  const post = await pictureModel.findById(req.params.id);
+  if (!post) return res.status(404).send('Post not found');
+
+  const { title, content, ImageUrl } = post;
+
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta property="og:title" content="${title}" />
+      <meta property="og:description" content="${content}" />
+      <meta property="og:image" content="${ImageUrl}" />
+      <meta property="og:type" content="article" />
+      <meta property="og:url" content="https://yourdomain.com/admin/picture/post/${post._id}" />
+      <title>${title}</title>
+    </head>
+    <body>
+      <script>
+        window.location.href = "https://yourdomain.com/admin/picture/post/${post._id}";
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+
+
 app.post("/admin/picture/post", async (req, res) => {
   try {
     const { title, content, price, ImageUrl, date } = req.body;
