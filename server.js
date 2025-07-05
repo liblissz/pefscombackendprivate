@@ -1126,12 +1126,12 @@ app.get('/share/picture/:id', async (req, res) => {
       <meta property="og:description" content="${content}" />
       <meta property="og:image" content="${ImageUrl}" />
       <meta property="og:type" content="article" />
-      <meta property="og:url" content="https://yourdomain.com/admin/picture/post/${post._id}" />
+      <meta property="og:url" content="https://pefscombackendprivate.onrender.com/admin/picture/post/${post._id}" />
       <title>${title}</title>
     </head>
     <body>
       <script>
-        window.location.href = "https://yourdomain.com/admin/picture/post/${post._id}";
+        window.location.href = "https://pefscombackendprivate.onrender.com/admin/picture/post/${post._id}";
       </script>
     </body>
     </html>
