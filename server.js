@@ -64,6 +64,9 @@ const connectdb = async () => {
 };
 
 
+// model/projectModel.js
+const mongoose = require('mongoose');
+
 const projectSchema = new mongoose.Schema({
   title: String,
   description: String,
@@ -83,12 +86,40 @@ const projectSchema = new mongoose.Schema({
       },
     }
   ],
-
   date: {
     type: Date,
     default: Date.now,
   },
-}, { _id: true });
+});
+
+module.exports = mongoose.model('Project', projectSchema);
+
+
+// const projectSchema = new mongoose.Schema({
+//   title: String,
+//   description: String,
+//   completed: Boolean,
+//   GithubLink: String,
+//   imageUrlwork: String,
+//   ratings: [
+//     {
+//       userId: {
+//         type: mongoose.Schema.Types.ObjectId,
+//         ref: 'User',
+//       },
+//       value: {
+//         type: Number,
+//         min: 1,
+//         max: 5,
+//       },
+//     }
+//   ],
+
+//   date: {
+//     type: Date,
+//     default: Date.now,
+//   },
+// }, { _id: true });
 
 const PefscomAdminSchema = new mongoose.Schema({
   username: { type: String, required: true },
@@ -670,38 +701,43 @@ app.get("/api/user/add-project/:id", async (req, res) => {
 
 
 
-
+// routes/projectRoutes.js or wherever you define your Express routes
+const Project = require('../models/projectModel');
+const User = require('../models/userModel');
 
 app.put('/api/user/rate-project/:userId/:projectId', async (req, res) => {
   const { userId, projectId } = req.params;
   const { rating } = req.body;
 
   try {
-    const user = await Usermodel.findById(userId);
+    // Optional: check if user exists
+    const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const project = user.projects.id(projectId);
+    // Get project directly from Project collection
+    const project = await Project.findById(projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     // Check if user already rated
     const existingRating = project.ratings.find(r => r.userId.toString() === userId);
+
     if (existingRating) {
-      existingRating.value = rating; // update
+      existingRating.value = rating;
     } else {
-      project.ratings.push({ userId, value: rating }); // new
+      project.ratings.push({ userId, value: rating });
     }
 
-    await user.save();
+    await project.save();
 
-    // Calculate average
+    // Calculate new average
     const total = project.ratings.reduce((sum, r) => sum + r.value, 0);
     const avg = total / project.ratings.length;
 
-    // Return updated data
     res.status(200).json({
-      ...project.toObject(),
+      message: "Rating updated",
       averageRating: avg,
       ratingsCount: project.ratings.length,
+      ratings: project.ratings,
     });
 
   } catch (error) {
@@ -709,6 +745,48 @@ app.put('/api/user/rate-project/:userId/:projectId', async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
+
+
+
+// app.put('/api/user/rate-project/:userId/:projectId', async (req, res) => {
+//   const { userId, projectId } = req.params;
+//   const { rating } = req.body;
+
+//   try {
+//     const user = await Usermodel.findById(userId);
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     const project = user.projects.id(projectId);
+//     if (!project) return res.status(404).json({ message: "Project not found" });
+
+//     // Check if user already rated
+//     const existingRating = project.ratings.find(r => r.userId.toString() === userId);
+//     if (existingRating) {
+//       existingRating.value = rating; // update
+//     } else {
+//       project.ratings.push({ userId, value: rating }); // new
+//     }
+
+//     await user.save();
+
+//     // Calculate average
+//     const total = project.ratings.reduce((sum, r) => sum + r.value, 0);
+//     const avg = total / project.ratings.length;
+
+//     // Return updated data
+//     res.status(200).json({
+//       ...project.toObject(),
+//       averageRating: avg,
+//       ratingsCount: project.ratings.length,
+//     });
+
+//   } catch (error) {
+//     console.error("Rating error:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
 
 
 
