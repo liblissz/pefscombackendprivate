@@ -1108,7 +1108,6 @@ const NotificationModel = mongoose.model('Notification', NotificationSchema);
 
 
 
-
 app.get('/share/picture/:id', async (req, res) => {
   const post = await pictureModel.findById(req.params.id);
   if (!post) return res.status(404).send('Post not found');
@@ -1128,18 +1127,21 @@ app.get('/share/picture/:id', async (req, res) => {
     <meta property="og:image:height" content="630" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://pefscomsystem.vercel.app/picturepost/${_id}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${content}" />
+    <meta name="twitter:image" content="${ImageUrl}" />
     <title>${title}</title>
   </head>
   <body>
     <p>Redirecting to the full post...</p>
     <script>
-      setTimeout(function () {
-        window.location.href = "https://pefscomsystem.vercel.app/picturepost/${_id}";
-      }, 3000); // Delay redirect by 3 seconds
+      window.location.href = "https://pefscomsystem.vercel.app/picturepost/${_id}";
     </script>
   </body>
   </html>`);
 });
+
 
 
 
