@@ -1109,39 +1109,45 @@ const NotificationModel = mongoose.model('Notification', NotificationSchema);
 
 
 app.get('/share/picture/:id', async (req, res) => {
-  const post = await pictureModel.findById(req.params.id);
-  if (!post) return res.status(404).send('Post not found');
+  try {
+    const post = await pictureModel.findById(req.params.id);
+    if (!post) return res.status(404).send('Post not found');
 
-  const { title, content, ImageUrl, _id } = post;
+    const { title, content, ImageUrl, _id } = post;
 
-  res.set('Content-Type', 'text/html');
-  res.send(`<!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta property="og:title" content="${title}" />
-    <meta property="og:description" content="${content}" />
-    <meta property="og:image" content="${ImageUrl}" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="https://pefscomsystem.vercel.app/picturepost/${_id}" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="${title}" />
-    <meta name="twitter:description" content="${content}" />
-    <meta name="twitter:image" content="${ImageUrl}" />
-    <title>${title}</title>
-  </head>
-  <body>
-    <p>Redirecting to the full post...</p>
-    <script>
-      window.location.href = "https://pefscomsystem.vercel.app/picturepost/${_id}";
-    </script>
-  </body>
-  </html>`);
+    // Make sure ImageUrl is an absolute URL including protocol
+    // e.g. https://your-domain.com/images/xyz.jpg
+
+    res.set('Content-Type', 'text/html');
+    res.send(`<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta property="og:title" content="${title}" />
+      <meta property="og:description" content="${content}" />
+      <meta property="og:image" content="${ImageUrl}" />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:type" content="article" />
+      <meta property="og:url" content="https://pefscomsystem.vercel.app/picturepost/${_id}" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="${title}" />
+      <meta name="twitter:description" content="${content}" />
+      <meta name="twitter:image" content="${ImageUrl}" />
+      <title>${title}</title>
+    </head>
+    <body>
+      <h1>${title}</h1>
+      <p>${content}</p>
+      <img src="${ImageUrl}" alt="${title}" style="max-width:100%;height:auto;" />
+      <p><a href="https://pefscomsystem.vercel.app/picturepost/${_id}">View Full Post</a></p>
+    </body>
+    </html>`);
+  } catch (err) {
+    res.status(500).send('Server error');
+  }
 });
-
 
 
 
